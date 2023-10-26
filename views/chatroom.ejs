@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Community Chat - General</title>
+</head>
+
+<body>
+    <h1>General Chat Room</h1>
+    <div id="chat">
+        <% messages.forEach((message)=> { %>
+            <p><strong>
+                    <%= message.user %>:
+                </strong>
+                <%= message.text %>
+            </p>
+            <% }); %>
+    </div>
+    <form id="chat-form">
+        <input type="text" id="message" placeholder="Type your message..." />
+        <button type="submit">Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const chatForm = document.getElementById('chat-form');
+        const chatMessage = document.getElementById('message');
+        const chat = document.getElementById('chat');
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            socket.emit('chat message', chatMessage.value);
+            chatMessage.value = '';
+        });
+
+        socket.on('chat message', (data) => {
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${data.user}:</strong> ${data.message}`;
+            chat.appendChild(p);
+        });
+    </script>
+</body>
+
+</html>

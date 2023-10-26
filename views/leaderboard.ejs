@@ -19,57 +19,28 @@
             <thead>
                 <tr>
                     <td>Rank</td>
-                    <td>
-                        Player
-                    </td>
-                    <td>
-                        Score
-                    </td>
+                    <td>Player</td>
+                    <td>Score</td>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td id="winner">1</td>
-                    <td>
-                        <p> Jose Brag</p>
-                    </td>
-                    <td>239</td>
-                </tr>
-
-                <tr>
-                    <td id="runner-up">2</td>
-                    <td>
-                        <p> Lily Simons</p>
-                    </td>
-                    <td>209</td>
-                </tr>
-
-                <tr>
-                    <td id="second-runner-up">3</td>
-                    <td>
-                        <p> Tom Higgle</p>
-                    </td>
-                    <td>154</td>
-                </tr>
-
-                <tr>
-                    <td>4</td>
-                    <td>
-                        <p> Alex Roger</p>
-                    </td>
-                    <td>100</td>
-                </tr>
-
-                <tr>
-                    <td>5</td>
-                    <td>
-                        <p> Mavie Ruth</p>
-                    </td>
-                    <td>82</td>
-                </tr>
+                <% leaderboardData.forEach(function(entry, index) { %>
+                    <tr>
+                        <td>
+                            <%= index + 1 %>
+                        </td>
+                        <td>
+                            <p>
+                                <%= entry.Player %>
+                            </p>
+                        </td>
+                        <td>
+                            <%= entry.Score %>
+                        </td>
+                    </tr>
+                    <% }); %>
             </tbody>
         </table>
-    </div>
     </div>
 </body>
 
