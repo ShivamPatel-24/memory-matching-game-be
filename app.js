@@ -5,10 +5,12 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+app.use(cors());
 
 const Leaderboard = require("./models/leaderboard")
 const Message = require("./models/message")
@@ -41,8 +43,8 @@ app.get('/api/leaderboard', async (req, res) => {
 
     try {
         const leaderboardData = await Leaderboard.find().sort({ Score: -1 }).limit(5); // Assuming we want the top 5 scores
-
-        res.render('leaderboard.ejs', { leaderboardData });
+        res.status(200).json(leaderboardData);
+        // res.render('leaderboard.ejs', { leaderboardData });
     } catch (error) {
         console.error('Error fetching leaderboard data:', error);
         res.status(500).send('Internal Server Error');
@@ -70,7 +72,8 @@ app.post('/api/leaderboard', async (req, res) => {
 app.get('/api/messages', async (req, res) => {
     try {
       const messages = await Message.find(); // Retrieve all messages
-      res.status(200).json(messages);
+      const messageContents = messages.map((message) => message.message);
+      res.status(200).json(messageContents);
 
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -81,6 +84,7 @@ app.get('/api/messages', async (req, res) => {
 app.post('/api/messages', async (req, res) => {
     try {
         const { message } = req.body;
+        console.log(req.body)
 
         if (!message) {
             return res.status(400).json({ error: 'Missing required fields: message' });
