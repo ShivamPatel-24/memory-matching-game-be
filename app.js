@@ -39,6 +39,11 @@ app.get('/chatroom', (req, res) => {
   });
 */
 
+
+app.get('/', (req, res) => {
+  res.send("Match-Making-Game")
+})
+
 app.get('/api/leaderboard', async (req, res) => {
 
     try {
