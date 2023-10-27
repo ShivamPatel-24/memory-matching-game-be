@@ -24,10 +24,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(morgan("dev"));
 
-mongoose.connect(process.env.DB_CLOUD_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
-    console.log("DB connection established");
+mongoose.connect(process.env.DB_CLOUD_URL).then(() => {
+  console.log("DB connection established");
 });
-
 app.get('/', (req, res) => {
   res.send("Match-Making-Game")
 })
