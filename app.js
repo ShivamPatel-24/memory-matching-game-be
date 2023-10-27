@@ -13,7 +13,8 @@ const io = socketIo(server);
 app.use(cors());
 
 const Leaderboard = require("./models/leaderboard")
-const Message = require("./models/message")
+const Message = require("./models/message");
+const leaderboard = require("./models/leaderboard");
 
 port = process.env.PORT || 3000;
 
@@ -23,48 +24,46 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(morgan("dev"));
 
-mongoose.connect(process.env.DB_LOCAL_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+mongoose.connect(process.env.DB_CLOUD_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     console.log("DB connection established");
 });
-
-/*
-app.get('/chatroom', (req, res) => {
-    res.render('chatroom', { messages: [] });
-  });
-  
-  io.on('connection', (socket) => {
-    socket.on('chat message', (message) => {
-      io.emit('chat message', { user: 'Anonymous', message });
-    });
-  });
-*/
-
 
 app.get('/', (req, res) => {
   res.send("Match-Making-Game")
 })
 
 app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const data = await Leaderboard.find();
+    leaderboardData = data.map((x) => ({
+      Rank: 0, 
+      Player: x.Player,
+      Score: parseInt(x.Score, 10),
+    }));
 
-    try {
-        const leaderboardData = await Leaderboard.find().sort({ Score: -1 }).limit(5); // Assuming we want the top 5 scores
-        res.status(200).json(leaderboardData);
-        // res.render('leaderboard.ejs', { leaderboardData });
-    } catch (error) {
-        console.error('Error fetching leaderboard data:', error);
-        res.status(500).send('Internal Server Error');
-    }
-})
+    leaderboardData.sort((a, b) => b.Score - a.Score);
+    leaderboardData.forEach((player, index) => {
+      player.Rank = index + 1;
+    });
+
+    const topFive = leaderboardData.slice(0, 5);
+    res.status(200).json(topFive);
+  } catch (error) {
+    console.error('Error fetching leaderboard data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 app.post('/api/leaderboard', async (req, res) => {
     try {
-      const { rank, player, score } = req.body; 
+      const { player, score } = req.body; 
 
-      if (!rank || !player || !score) {
-        return res.status(400).json({ error: 'Missing required fields: rank, player, or score' });
+      if (!player || !score) {
+        return res.status(400).json({ error: 'Missing required fields: player, or score' });
       }
   
-      const newEntry = new Leaderboard({ Rank: rank, Player: player, Score: score });
+      const newEntry = new Leaderboard({ Player: player, Score: score });
       await newEntry.save();
   
       res.status(201).json({ message: 'Leaderboard entry added successfully' });
